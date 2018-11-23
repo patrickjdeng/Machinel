@@ -1,3 +1,5 @@
+import sys
+from collections import Counter
 import parse
 import decisionTree
 import predict
@@ -5,47 +7,106 @@ import neuralNet
 import neighbors
 import naiveBayes
 import numpy as np
-from collections import Counter
+import random
 
-X,Y = parse.read()
-print(len(X))
-print(len(Y))
+NAME = 0
+VALUE_LIST = 1
 
-X = np.array(X)
-X = X.astype(np.float64)
+def find_average(index, instance_set):
+    '''given index, set, find average of value at index for each entry in set'''
+    total = 0
+    for row in instance_set:
+        if row[index] != '?':
+            total += float(row[index])
+    return total/len(instance_set)
 
-tree = decisionTree.trainTree(X,Y)
-#nn = neuralNet.trainNet(X,Y)
-neighbor = neighbors.trainNeighbors(X,Y)
-bayes = naiveBayes.trainBayes(X,Y)
+def find_most_common(index, value_set, instance_set):
+    '''given index, possible value set, training set, find most common of value at index for each entry in set'''
+    counts = []
+    for _ in range(len(value_set)):
+        counts.append(0)
+    for row in instance_set:
+        if row[index] != '?':
+            value = row[index]
+            value_index = value_set.index(value)
+            counts[value_index] += 1
+    
+    max_count = 0
+    for count in counts:
+        if count > max_count:
+            max_count = count
+    max_index = counts.index(max_count)
+    return value_set[max_index]
 
-attr = []
+def fill_in_missing_values(attr_types, set):
+    #fill in missing values based on most common/average
+    for i in range(len(attr_types) - 1):
+        if attr_types[i][NAME][0] == 'C':
+            attr_value = find_average(i,set) 
+        else:
+            attr_values_list = attr_types[i][VALUE_LIST]
+            attr_value = find_most_common(i, attr_values_list, set)
+        for j in range(len(set)):
+            if set[j][i] == '?':
+                set[j][i] = attr_value
 
-with open('data/prelim-nmv-noclass.txt','r') as infile:
-    for x in range (0,10):
-        line = infile.readline()
-        attrs = line.split()
-        attrs.pop()
-        attr.append(attrs)
+def main():
+    attribute_filename = sys.argv[1]
+    training_filename = sys.argv[2]
+    test_filename = sys.argv[3]   #parametrized name
 
-attr = np.array(attr)
-attr = attr.astype(np.float64)
+    attr_types = parse.read_attribute_file(attribute_filename)
 
-treePredictions = predict.predictions(tree,attr)
-neigborPredictions = predict.predictions(neighbor,attr)
-bayesPredictions = predict.predictions(bayes,attr)
+    X,Y = parse.read_training_file(training_filename)
 
-print(treePredictions)
-print(neigborPredictions)
-print(bayesPredictions)
+    print(len(X))
+    print(len(Y))
 
-rawPredictions = zip(treePredictions,neigborPredictions,bayesPredictions)
 
-predictions = []
-for p in rawPredictions:
-    data = Counter(p)
-    predictions.append(int(data.most_common(1)[0][0]))
+    fill_in_missing_values(attr_types, X)
+    X = np.array(X)
+    X = X.astype(np.float64)
 
-with open('predictions.txt','w') as outfile:
-    for p in predictions:
-        print >> outfile, p
+
+    tree = decisionTree.trainTree(X,Y)
+    #nn = neuralNet.trainNet(X,Y)
+    neighbor = neighbors.trainNeighbors(X,Y)
+    bayes = naiveBayes.trainBayes(X,Y)
+
+    attr = []
+
+
+    with open(test_filename,'r') as infile:
+        for x in range (0,10):
+            line = infile.readline()
+            attrs = line.split()
+            attrs.pop()
+            attr.append(attrs)
+
+
+    fill_in_missing_values(attr_types, attr)
+    attr = np.array(attr)
+    attr = attr.astype(np.float64)
+
+
+    treePredictions = predict.predictions(tree,attr)
+    neigborPredictions = predict.predictions(neighbor,attr)
+    bayesPredictions = predict.predictions(bayes,attr)
+
+    print(treePredictions)
+    print(neigborPredictions)
+    print(bayesPredictions)
+
+    rawPredictions = zip(treePredictions,neigborPredictions,bayesPredictions)
+
+    predictions = []
+    for p in rawPredictions:
+        data = Counter(p)
+        predictions.append(int(data.most_common(1)[0][0]))
+
+    with open('predictions.txt','w') as outfile:
+        for p in predictions:
+            print >> outfile, p
+
+
+main()
