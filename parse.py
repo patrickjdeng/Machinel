@@ -15,7 +15,7 @@ def read_attribute_file(attr_file):
     lst = []
     infile = open(attr_file)
     for line in infile:
-        print line
+        line = line.translate(None,' ')
         line_fields = line.split(':')
         if 'C' in line:
             attribute = line_fields
@@ -23,9 +23,11 @@ def read_attribute_file(attr_file):
             attribute = []
             attribute.append(line_fields[0])
             values_list = line_fields[1].split(',')
-            no_question_list = values_list[:-1] # remove '?.'
-            attribute.append(no_question_list)
-        print attribute
+            if '?' in values_list[-1]: #for some reason we have
+                values_list[-1] = values_list[-1].translate(None,'()?.\n ')
+            if values_list[-1] == '':
+                values_list = values_list [:-1]
+            attribute.append(values_list)
         lst.append(attribute)
     return lst
 

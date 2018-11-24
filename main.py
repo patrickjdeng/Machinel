@@ -20,14 +20,15 @@ def find_average(index, instance_set):
             total += float(row[index])
     return total/len(instance_set)
 
-def find_most_common(index, value_set, instance_set):
+def find_most_common(attr_index, value_set, instance_set):
     '''given index, possible value set, training set, find most common of value at index for each entry in set'''
     counts = []
     for _ in range(len(value_set)):
         counts.append(0)
     for row in instance_set:
-        if row[index] != '?':
-            value = row[index]
+        if row[attr_index] != '?':
+            #find index of value in value set and increment count of it
+            value = row[attr_index]
             value_index = value_set.index(value)
             counts[value_index] += 1
     
