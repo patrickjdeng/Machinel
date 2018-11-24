@@ -42,9 +42,10 @@ def find_most_common(attr_index, value_set, instance_set):
 def fill_in_missing_values(attr_types, set):
     #fill in missing values based on most common/average
     for i in range(len(attr_types) - 1):
-        if attr_types[i][NAME][0] == 'C':
+        attr_name = attr_types[i][NAME]
+        if attr_name[0] == 'C':
             attr_value = find_average(i,set) 
-        else:
+        elif attr_name[0] == 'D':
             attr_values_list = attr_types[i][VALUE_LIST]
             attr_value = find_most_common(i, attr_values_list, set)
         for j in range(len(set)):
@@ -78,7 +79,7 @@ def main():
 
 
     with open(test_filename,'r') as infile:
-        for x in range (0,10):
+        for x in range (len(infile)):
             line = infile.readline()
             attrs = line.split()
             attrs.pop()
