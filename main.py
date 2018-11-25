@@ -79,7 +79,7 @@ def main():
 
 
     with open(test_filename,'r') as infile:
-        for x in range (len(infile)):
+        for x in range (4000):
             line = infile.readline()
             attrs = line.split()
             attrs.pop()
@@ -107,8 +107,9 @@ def main():
         predictions.append(int(data.most_common(1)[0][0]))
 
     with open('predictions.txt','w') as outfile:
-        for p in predictions:
-            print >> outfile, p
+        for p in predictions[:-1]:
+            outfile.write(str(p) + '\n')
+        outfile.write(str(predictions[-1]))
 
 
 main()
