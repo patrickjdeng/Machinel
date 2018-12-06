@@ -89,18 +89,43 @@ def main():
     fill_in_missing_values(attr_types, attr)
     attr = np.array(attr)
     attr = attr.astype(np.float64)
+    treeTrainPred = predict.predictions(tree, X)
+    neighborTrainPred = predict.predictions(neighbor, X)
+    bayesTrainPred = predict.predictions(bayes, X)
+    '''
+    neuralX = []
+    for i in range(len(treeTrainPred)):
+        #make list of 1800 rows of 3 values (prediction of eachk)
+        neuralX.append([treeTrainPred[i], neighborTrainPred[i], bayesTrainPred[i]])
+    neuralX = np.array(neuralX)
+    neuralX = neuralX.astype(np.float64)
+    print(len(neuralX))
 
 
+    nn = neuralNet.trainNet(neuralX,Y)
+    '''
+    
     treePredictions = predict.predictions(tree,attr)
-    neigborPredictions = predict.predictions(neighbor,attr)
+    neighborPredictions = predict.predictions(neighbor,attr)
     bayesPredictions = predict.predictions(bayes,attr)
 
     print(treePredictions)
-    print(neigborPredictions)
+    print(neighborPredictions)
     print(bayesPredictions)
-
-    rawPredictions = zip(treePredictions,neigborPredictions,bayesPredictions)
-
+    
+    
+    rawPredictions = zip(treePredictions, neighborPredictions, bayesPredictions)
+    '''
+    attrX = []
+    for i in range(len(treeTrainPred)):
+        #make list of 1800 rows of 3 values (prediction of eachk)
+        attrX.append([treeTrainPred[i], neighborTrainPred[i], bayesTrainPred[i]])
+    print(len(attrX))
+    attrX = np.array(attrX)
+    attrX = attrX.astype(np.float64)
+    nnPredictions = predict.predictions(nn, attrX)
+    rawPredictions = zip(treePredictions,neighborPredictions,bayesPredictions)
+    '''
     predictions = []
     for p in rawPredictions:
         data = Counter(p)
