@@ -5,8 +5,6 @@ def read_file(filename):
     array = []
     for line in infile:
         array.append(line.strip('\n'))
-    print(array)
-    print('\n\n\n\n\n')
     return array
 
 def main():
