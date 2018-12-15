@@ -125,12 +125,12 @@ def main():
 
 
     predictions_array = []
-    for i in range(100):
+    for i in range(1000):
         subsetX = []
         subsetY = []
         possible_indices = range(len(X))
-        #pick 10 random training sets, predict based on them
-        for j in range(len(X)/20):
+        #pick 100 random training sets, predict based on them
+        for j in range(len(X)/10):
             random_num = random.randrange(0,len(possible_indices),1)
             index = possible_indices[random_num]
             subsetX.append(X[index])
